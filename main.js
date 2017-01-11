@@ -24,6 +24,7 @@ function createWindow () {
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools()
+  require('devtron').install()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
