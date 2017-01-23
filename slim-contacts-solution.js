@@ -124,6 +124,10 @@ Slim.tag('slim-contacts', class SlimContacts extends Slim {
             this.model.remove(contact)
             // this.update()
         })
+
+        this.addEventListener('changeContact', contact => {
+            this.model.save()
+        })
     }
 
     select(contact) {
@@ -141,7 +145,36 @@ Slim.tag('slim-contacts', class SlimContacts extends Slim {
 
 })
 
+Slim.tag('slim-rating', class extends Slim {
 
+    get template() {
+        return `<div>${this.getStars()}</div>`
+    }
+
+    getStars() {
+        let res = 'O'
+        while (res.length <= this.data.rating) {
+            res += 'O'
+        }
+
+        while (res.length < 5) {
+            res += '-'
+        }
+        return res
+    }
+
+    onAfterRender() {
+        this.onclick = () => {
+            this.data.rating++
+            this.data.rating = this.data.rating % 5
+            this.callAttribute('change')
+            this.render()
+        }
+
+    }
+
+
+})
 
 Slim.tag('slim-contact-view', class SlimContactView extends Slim {
 
@@ -149,9 +182,10 @@ Slim.tag('slim-contact-view', class SlimContactView extends Slim {
         return `
 <div class="row contact-entry">
 <div class="col-xs-1"><input type="button" slim-id="btnRemove" class="btn btn-xs btn-danger" value="X" /> </div>
-<div class="col-xs-4"><slim-editable-input text="[[data.first]]" slim-id="inpFirst"></slim-editable-input> <slim-editable-input text="[[data.last]]" slim-id="inpLast"></slim-editable-input></div>
+<div class="col-xs-2"><slim-editable-input text="[[data.first]]" slim-id="inpFirst"></slim-editable-input> <slim-editable-input text="[[data.last]]" slim-id="inpLast"></slim-editable-input></div>
 <div class="col-xs-3"><slim-editable-input slim-id="inpEmail"></slim-editable-input></div>
 <div class="col-xs-4"><slim-phones slim-id="phones"></slim-phones></div>
+<div class="col-xs-2"><slim-rating slim-id="visRating" change="dispatchChange"></slim-rating></div>
 </div>`
     }
 
@@ -159,14 +193,19 @@ Slim.tag('slim-contact-view', class SlimContactView extends Slim {
         this.inpEmail.text = this.data.email
         this.inpEmail.onchange = () => {
             this.data.email = this.inpEmail.text
+            this.dispatchChange()
         }
         this.inpFirst.onchange = () => {
             this.data.first = this.inpFirst.text
+            this.dispatchChange()
         }
 
         this.inpLast.onchange = () => {
             this.data.last = this.inpLast.text
+            this.dispatchChange()
         }
+
+        this.visRating.data = this.data
 
         this.btnRemove.onclick = () => {
             let e = new Event('removeContact', {bubbles:true})
@@ -175,6 +214,12 @@ Slim.tag('slim-contact-view', class SlimContactView extends Slim {
         }
 
         this.phones.data = this.data.phones
+    }
+
+    dispatchChange() {
+        let e = new Event('changeContact', {bubbles:true})
+        e.value = this.data
+        this.dispatchEvent(e)
     }
 
 

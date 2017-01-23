@@ -41,6 +41,7 @@ class Contact {
         this.first = first
         this.last = last
         this.email = 'moshe@vilner.com'
+        this.rating = 2
         this.phones = []
     }
 
