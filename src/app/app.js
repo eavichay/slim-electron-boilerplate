@@ -105,4 +105,4 @@ Slim.tag('slim-app', class extends Slim {
 })
 
 
-require('./slim-contacts')
+require('./slim-contacts-solution')
